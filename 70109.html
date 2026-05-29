@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吸血鬼 vs 獵人</title>
+    <style>
+        .grid-container {
+            display: grid;
+            gap: 2px;
+            margin-top: 20px;
+        }
+        .grid-item {
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            vertical-align: middle;
+            line-height: 30px;
+            font-size: 18px;
+            border: 1px solid black;
+        }
+        .neutral {
+            background-color: white;
+        }
+        .vampire {
+            background-color: red;
+            opacity: 0.5;
+        }
+        .hunter {
+            background-color: blue;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>吸血鬼 vs 獵人</h1>
+
+    <label for="gridSize">盤面大小 (N*N): </label>
+    <input type="number" id="gridSize" min="3" max="20" value="5">
+    <label for="vampirePos">吸血鬼位置 (x,y): </label>
+    <input type="text" id="vampirePos" value="2,2">
+    <label for="hunterPos">獵人位置 (x,y): </label>
+    <input type="text" id="hunterPos" value="3,3">
+    <button onclick="initGrid()">初始化盤面</button>
+
+    <div id="grid" class="grid-container"></div>
+
+    <button onclick="vampireSpread()">按鈕A (吸血鬼擴展)</button>
+    <button onclick="hunterSpread()">按鈕B (獵人擴展)</button>
+
+    <script src="game.js"></script>
+</body>
+</html>
