@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>APCS o711 裝飲料模擬器</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.6; max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f4f4f9; }
+        .container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; font-size: 1.5em; }
+        .input-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; width: 100%; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; padding: 15px; border-left: 5px solid #007bff; background: #e9ecef; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>o711. 裝飲料模擬器</h1>
+    <p>依據題目設定：杯子由上下兩個長方體組成。</p>
+    
+    <div class="input-group">
+        <label>倒水次數 (n):</label>
+        <input type="number" id="n" value="3" min="1" max="10">
+    </div>
+    
+    <div class="input-group">
+        <label>下方寬度 (w1) 與 高度 (h1):</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="w1" placeholder="w1" value="5">
+            <input type="number" id="h1" placeholder="h1" value="10">
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>上方寬度 (w2) 與 高度 (h2):</label>
+        <div style="display: flex; gap: 10px;">
+            <input type="number" id="w2" placeholder="w2" value="3">
+            <input type="number" id="h2" placeholder="h2" value="10">
+        </div>
+    </div>
+    
+    <div class="input-group">
+        <label>每次倒水容量 (以空格或逗號隔開):</label>
+        <input type="text" id="volumes" value="50, 100, 200">
+    </div>
+    
+    <button onclick="calculateMaxRise()">計算最大上升量</button>
+
+    <div id="result"></div>
+</div>
+
+<script>
+function calculateMaxRise() {
+    // 讀取輸入
+    const w1 = parseInt(document.getElementById('w1').value);
+    const h1 = parseInt(document.getElementById('h1').value);
+    const w2 = parseInt(document.getElementById('w2').value);
+    const h2 = parseInt(document.getElementById('h2').value);
+    const volStr = document.getElementById('volumes').value;
+    const volArr = volStr.split(/[ ,]+/).map(Number);
+
+    const v1_max = w1 * w1 * h1; // 下層總容量
+    const v2_max = w2 * w2 * h2; // 上層總容量
+    const total_cap = v1_max + v2_max; // 總容量
+    
+    let current_v = 0;
+    let current_h = 0;
+    let max_rise = 0;
+    let log = "每次上升過程：<br>";
+
+    for (let i = 0; i < volArr.length; i++) {
+        let v_add = volArr[i];
+        let old_h = current_h;
+        
+        // 更新當前總水量 (不超過總容量)
+        current_v = Math.min(current_v + v_add, total_cap);
+        
+        // 計算新高度
+        let new_h = 0;
+        if (current_v <= v1_max) {
+            new_h = current_v / (w1 * w1);
+        } else {
+            new_h = h1 + (current_v - v1_max) / (w2 * w2);
+        }
+        
+        let rise = new_h - old_h;
+        log += `第 ${i+1} 次：上升 ${rise.toFixed(2)} cm (目前總高: ${new_h.toFixed(2)} cm)<br>`;
+        
+        if (rise > max_rise) max_rise = rise;
+        current_h = new_h;
+    }
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = `<strong>最大上升量：${max_rise.toFixed(0)} cm</strong><br><br>` + log;
+}
+</script>
+
+</body>
+</html>
