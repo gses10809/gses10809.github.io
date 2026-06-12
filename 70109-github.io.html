@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐧 南極 1A2B 挑戰</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:"Microsoft JhengHei",sans-serif;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:linear-gradient(
+        to bottom,
+        #7fdfff 0%,
+        #c9f1ff 40%,
+        #f5fcff 100%
+    );
+}
+
+.container{
+    max-width:700px;
+    margin:30px auto;
+    padding:20px;
+}
+
+.title{
+    text-align:center;
+    color:#0d4b78;
+    margin-bottom:20px;
+}
+
+.title h1{
+    font-size:2.3rem;
+}
+
+.game-box{
+    background:rgba(255,255,255,.85);
+    backdrop-filter:blur(10px);
+    border-radius:25px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.15);
+}
+
+.info{
+    text-align:center;
+    margin-bottom:20px;
+    color:#135a8b;
+}
+
+.input-group{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+input{
+    flex:1;
+    padding:15px;
+    font-size:1.3rem;
+    border:none;
+    border-radius:15px;
+    text-align:center;
+    outline:none;
+    background:#eefaff;
+}
+
+button{
+    padding:15px 25px;
+    border:none;
+    border-radius:15px;
+    cursor:pointer;
+    background:#00a2ff;
+    color:white;
+    font-weight:bold;
+    transition:.2s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    background:#0087d4;
+}
+
+.result{
+    text-align:center;
+    font-size:1.2rem;
+    margin-bottom:20px;
+    color:#0b5f8f;
+    min-height:30px;
+}
+
+.history{
+    max-height:350px;
+    overflow-y:auto;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    background:#eef9ff;
+    margin-bottom:8px;
+    padding:12px;
+    border-radius:12px;
+}
+
+.row span:last-child{
+    font-weight:bold;
+    color:#006cb8;
+}
+
+.win{
+    color:#00a651;
+    font-size:1.4rem;
+    font-weight:bold;
+}
+
+.penguin{
+    text-align:center;
+    font-size:80px;
+    animation:bounce 2s infinite;
+}
+
+@keyframes bounce{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-12px)}
+}
+
+.mountain{
+    position:fixed;
+    bottom:0;
+    width:100%;
+    height:220px;
+    background:
+    polygon(0 100%,20% 30%,40% 100%,55% 20%,70% 100%,85% 40%,100% 100%);
+}
+
+.snow{
+    position:fixed;
+    top:-20px;
+    color:white;
+    animation:snow linear infinite;
+}
+
+@keyframes snow{
+    to{
+        transform:translateY(110vh);
+    }
+}
+</style>
+</head>
+<body>
+
+<div id="snow-container"></div>
+
+<div class="container">
+
+    <div class="title">
+        <h1>🐧 南極 1A2B 挑戰</h1>
+        <p>找出企鵝藏起來的 4 位數密碼！</p>
+    </div>
+
+    <div class="penguin" id="penguin">
+        🐧
+    </div>
+
+    <div class="game-box">
+
+        <div class="info">
+            請輸入 4 位不重複數字
+        </div>
+
+        <div class="input-group">
+            <input
+                id="guess"
+                maxlength="4"
+                placeholder="例如 1234">
+            <button onclick="checkGuess()">
+                ❄️ 猜猜看
+            </button>
+        </div>
+
+        <div class="result" id="result"></div>
+
+        <div class="history" id="history"></div>
+
+        <div style="text-align:center;margin-top:20px;">
+            <button onclick="newGame()">
+                🔄 新遊戲
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+let answer="";
+let attempts=0;
+
+function generateAnswer(){
+    let nums=['0','1','2','3','4','5','6','7','8','9'];
+
+    for(let i=nums.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [nums[i],nums[j]]=[nums[j],nums[i]];
+    }
+
+    return nums.slice(0,4).join('');
+}
+
+function newGame(){
+
+    answer=generateAnswer();
+    attempts=0;
+
+    document.getElementById("history").innerHTML="";
+    document.getElementById("result").innerHTML="";
+    document.getElementById("guess").value="";
+    document.getElementById("penguin").textContent="🐧";
+
+    console.log("答案:",answer);
+}
+
+function checkGuess(){
+
+    let guess=document.getElementById("guess").value.trim();
+
+    if(!/^\d{4}$/.test(guess)){
+        alert("請輸入4位數字");
+        return;
+    }
+
+    if(new Set(guess).size!==4){
+        alert("數字不能重複");
+        return;
+    }
+
+    attempts++;
+
+    let A=0;
+    let B=0;
+
+    for(let i=0;i<4;i++){
+
+        if(guess[i]===answer[i]){
+            A++;
+        }
+        else if(answer.includes(guess[i])){
+            B++;
+        }
+    }
+
+    let row=document.createElement("div");
+    row.className="row";
+    row.innerHTML=`
+        <span>${attempts}. ${guess}</span>
+        <span>${A}A${B}B</span>
+    `;
+
+    document.getElementById("history")
+        .prepend(row);
+
+    if(A===4){
+
+        document.getElementById("result").innerHTML=
+            `<div class="win">
+            🎉 恭喜破解企鵝密碼！
+            <br>
+            答案是 ${answer}
+            <br>
+            共猜了 ${attempts} 次
+            </div>`;
+
+        document.getElementById("penguin").textContent="🎉🐧";
+
+    }else{
+
+        document.getElementById("result").textContent=
+            `${A}A${B}B`;
+    }
+
+    document.getElementById("guess").value="";
+    document.getElementById("guess").focus();
+}
+
+document.getElementById("guess")
+.addEventListener("keypress",e=>{
+    if(e.key==="Enter"){
+        checkGuess();
+    }
+});
+
+function createSnow(){
+
+    const snow=document.createElement("div");
+    snow.className="snow";
+    snow.innerHTML="❄";
+
+    snow.style.left=Math.random()*100+"vw";
+    snow.style.fontSize=(10+Math.random()*20)+"px";
+
+    let duration=5+Math.random()*10;
+
+    snow.style.animationDuration=
+        duration+"s";
+
+    document.body.appendChild(snow);
+
+    setTimeout(()=>{
+        snow.remove();
+    },duration*1000);
+}
+
+setInterval(createSnow,200);
+
+newGame();
+
+</script>
+
+</body>
+</html>
